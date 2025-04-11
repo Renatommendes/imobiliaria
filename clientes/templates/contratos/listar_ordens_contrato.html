@@ -1,0 +1,279 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Listagem de Ordens de Contrato</h2>
+
+{% if request.user.username == "administrador" %}
+    <form method="GET">
+        <label for="usuario">Selecione um usuário:</label>
+        <select name="usuario" id="usuario" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for user in usuarios %}
+                <option value="{{ user.id }}" {% if user.id|stringformat:"s" == usuario_selecionado %}selected{% endif %}>
+                    {{ user.username }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+{% endif %}
+
+{# 🔹 ADMINISTRADOR: Visualiza ordens agrupadas por etapa #}
+{% if request.user.username == "administrador" and etapas_agrupadas %}
+    {% for etapa, ordens in etapas_agrupadas.items %}
+        <h3>Etapa: {{ etapa.numero }} - {{ etapa.nome }}
+            {% if not etapa.habilitada %}
+                <span style="color: red;">(Bloqueada)</span>
+            {% else %}
+                <span style="color: green;">(Liberada)</span>
+            {% endif %}
+        </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Data de Criação</th>
+                    <th>Arquivo</th>
+                    <th>Ação</th>
+                    <th>Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ordem in ordens %}
+                    <tr>
+                        <td>{{ ordem.usuario.username }}</td>
+                        <td>{{ ordem.nome }}</td>
+                        <td>{{ ordem.tipo }}</td>
+                        <td>{{ ordem.status }}</td>
+                        <td>{{ ordem.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if ordem.arquivo %}
+                                <a href="{{ ordem.arquivo.url }}" target="_blank">Baixar</a>
+                            {% else %}
+                                Nenhum arquivo enviado
+                            {% endif %}
+                        </td>
+                        <td>✅ Concluído</td>
+                        <td>
+                            <a href="{% url 'editar_ordem_contrato' ordem.id %}">✏️ Editar</a> |
+                            <a href="{% url 'excluir_ordem_contrato' ordem.id %}" onclick="return confirm('Tem certeza que deseja excluir esta ordem?');">🗑️ Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endif %}
+
+{# 🔹 USUÁRIO COMUM: Visualiza ordens por etapas com abas estilizadas #}
+{% if request.user.username != "administrador" and etapas_ordenadas %}
+    <ul class="tab-buttons">
+        {% for bloco in etapas_ordenadas %}
+            <li>
+                <button class="tab-btn {% if bloco.etapa.habilitada %}liberada{% else %}bloqueada{% endif %} {% if forloop.first %}active{% endif %}"
+                        onclick="showTab('tab{{ forloop.counter }}', this)">
+                    Etapa {{ bloco.etapa.numero }} - {{ bloco.etapa.nome }}
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% for bloco in etapas_ordenadas %}
+        <div id="tab{{ forloop.counter }}" class="tab-content" style="{% if forloop.first %}display: block;{% else %}display: none;{% endif %}">
+            <h3>Etapa {{ bloco.etapa.numero }} - {{ bloco.etapa.nome }}
+                {% if bloco.etapa.habilitada %}
+                    <span style="color: green;">(Liberada)</span>
+                {% else %}
+                    <span style="color: red;">(Bloqueada)</span>
+                {% endif %}
+            </h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Data de Criação</th>
+                        <th>Arquivo</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in bloco.ordens %}
+                        {% with ordem=info.ordem pode_enviar=info.pode_enviar %}
+                            <tr>
+                                <td>{{ ordem.nome }}</td>
+                                <td>{{ ordem.tipo }}</td>
+                                <td>{{ ordem.status }}</td>
+                                <td>{{ ordem.data_criacao|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if ordem.arquivo %}
+                                        <a href="{{ ordem.arquivo.url }}" target="_blank">Baixar</a>
+                                    {% else %}
+                                        Nenhum arquivo enviado
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ordem.tipo_envio == 'visualizacao' %}
+                                        {% if ordem.arquivo %}
+                                            <span class="text-muted">Somente visualização</span><br>
+                                            <a href="{{ ordem.arquivo.url }}" target="_blank">Visualizar contrato</a>
+                                        {% else %}
+                                            <span class="text-muted">Nenhum documento disponível</span>
+                                        {% endif %}
+                                    {% elif pode_enviar %}
+                                        <form method="POST" action="{% url 'submeter_arquivo' ordem.id %}" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="file" name="arquivo" accept="application/pdf" required>
+                                            {% if ordem.status == "Concluído" %}
+                                                <button type="submit">Editar Arquivo</button>
+                                            {% else %}
+                                                <button type="submit">Enviar</button>
+                                            {% endif %}
+                                        </form>
+                                        {% if ordem.arquivo %}
+                                            <br>
+                                            <a href="{{ ordem.arquivo.url }}" target="_blank">Visualizar contrato enviado</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Etapa bloqueada</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if bloco.etapa.habilitada and bloco.somente_visualizacao %}
+                <form method="POST" action="{% url 'validar_etapa' bloco.etapa.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Validar Etapa</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <style>
+        .tab-buttons {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-buttons li {
+            margin: 0;
+        }
+
+        .tab-buttons .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .tab-buttons .liberada {
+            background-color: green;
+        }
+
+        .tab-buttons .bloqueada {
+            background-color: red;
+        }
+
+        .tab-buttons .active {
+            box-shadow: 0 0 5px #000;
+            outline: 2px solid black;
+        }
+
+        .tab-content {
+            margin-top: 10px;
+        }
+    </style>
+
+    <script>
+        function showTab(tabId, button) {
+            var tabs = document.querySelectorAll(".tab-content");
+            tabs.forEach(tab => tab.style.display = "none");
+
+            document.getElementById(tabId).style.display = "block";
+
+            var buttons = document.querySelectorAll(".tab-btn");
+            buttons.forEach(btn => btn.classList.remove("active"));
+
+            button.classList.add("active");
+        }
+    </script>
+{% endif %}
+
+{% if request.user.username == "administrador" %}
+    <a href="{% url 'criar_ordem_contrato' %}">Adicionar Nova Ordem</a>
+{% endif %}
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+    }
+
+    thead {
+        background-color: #2c3e50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #e0f7fa;
+    }
+
+    a {
+        color: #2980b9;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .text-muted {
+        color: #888;
+        font-style: italic;
+    }
+
+    button[type="submit"] {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #2980b9;
+    }
+
+    input[type="file"] {
+        margin-bottom: 5px;
+    }
+</style>
+
+{% endblock %}

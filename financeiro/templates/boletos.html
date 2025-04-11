@@ -1,0 +1,86 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <!-- Exibição de mensagens de feedback -->
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h1>Boletos</h1>
+
+
+
+    <!-- Formulário para Upload de Boletos -->
+    {% if user.username == 'administrador' %}
+    <h2>Adicionar Boleto</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <p>
+            <label for="id_usuario">Selecione o Usuário:</label>
+            {{ form.usuario }}
+        </p>
+        <p>
+            <label for="id_valor">Valor:</label>
+            {{ form.valor }}
+        </p>
+        <p>
+            <label for="id_data_vencimento">Data de Vencimento:</label>
+            <input type="text" id="id_data_vencimento" name="data_vencimento" placeholder="dd/mm/yyyy" value="{{ form.data_vencimento.value|date:'d/m/Y' }}">
+        </p>
+        <p>
+            <label for="id_pago">Pago:</label>
+            {{ form.pago }}
+        </p>
+        <p>
+            <label for="id_arquivo_pdf">Arquivo PDF:</label>
+            {{ form.arquivo_pdf }}
+        </p>
+
+        <button type="submit">Salvar</button>
+    </form>
+    {% endif %}
+
+    <!-- Lista de Boletos Cadastrados -->
+    <h2>Boletos Cadastrados</h2>
+    <ul>
+        {% for boleto in boletos %}
+            <li>
+                {{ boleto.usuario.username }} - R$ {{ boleto.valor }} - Vencimento: {{ boleto.data_vencimento|date:"d/m/Y" }}
+                {% if boleto.arquivo_pdf %}
+                    | <a href="{{ boleto.arquivo_pdf.url }}" target="_blank">Ver PDF</a>
+                {% endif %}
+                
+                <!-- Botões de Editar e Excluir (Apenas para Administrador) -->
+                {% if user.username == 'administrador' %}
+                    | <a href="{% url 'editar_boleto' boleto.id %}">Editar</a>
+                    | <a href="{% url 'excluir_boleto' boleto.id %}" onclick="return confirm('Tem certeza que deseja excluir este boleto?');">Excluir</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Script para formatação da data -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataVencimentoInput = document.getElementById('id_data_vencimento');
+
+            // Quando o usuário sair do campo de data, formatar a data para dd/mm/yyyy
+            dataVencimentoInput.addEventListener('blur', function() {
+                const data = dataVencimentoInput.value;
+                const parts = data.split('/');
+                
+                if (parts.length === 3) {
+                    // Se a data está no formato dd/mm/yyyy, converte para yyyy-mm-dd
+                    const formattedDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+                    dataVencimentoInput.value = formattedDate;
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "home.html" %}
+
+{% block content %}
+  <h2>Processos</h2>
+
+  {% if request.user.username == "administrador" %}
+    <a href="{% url 'adicionar_fase' %}">➕ Adicionar Fase</a>
+    <br><br>
+  {% endif %}
+
+  <form method="get">
+    <label for="usuario">Selecione o usuário:</label>
+    <select name="usuario" id="usuario" onchange="this.form.submit()">
+      <option value="">-- Selecione --</option>
+      {% for user in usuarios %}
+        <option value="{{ user.id }}" {% if user.id|stringformat:"s" == usuario_id %}selected{% endif %}>
+          {{ user.username }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+
+  {% if usuario_id %}
+    {% if fases %}
+      <h3>Fases do usuário selecionado:</h3>
+      <ul>
+        {% for fase in fases %}
+          <li>
+            <strong>Fase {{ fase.numero }}</strong>: {{ fase.nome }}
+            {% if request.user.username == "administrador" %}
+              <a href="{% url 'adicionar_item_fase' %}?fase_id={{ fase.id }}">➕ Adicionar Item</a>
+            {% endif %}
+
+            {% with fase.itens.all as itens %}
+              {% if itens %}
+                <ul style="margin-top: 10px;">
+                  {% for item in itens %}
+                    <li>
+                      <strong>{{ item.titulo }}</strong><br>
+                      {{ item.descricao }}<br>
+                      {% if item.arquivo %}
+                        <a href="{{ item.arquivo.url }}" target="_blank">📄 Ver Arquivo</a>
+                      {% else %}
+                        <em>Nenhum arquivo enviado.</em>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p><em>Nenhum item adicionado ainda.</em></p>
+              {% endif %}
+            {% endwith %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p><em>Este usuário ainda não possui nenhuma fase cadastrada.</em></p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

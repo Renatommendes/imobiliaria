@@ -1,0 +1,52 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Minhas Ordens de Contrato</h2>
+
+{% if ordens %}
+<table border="1">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Arquivo</th>
+            {% if not eh_admin %} <th>Ação</th> {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for ordem in ordens %}
+        <tr>
+            <td>{{ ordem.nome }}</td>
+            <td>{{ ordem.tipo }}</td>
+            <td>{{ ordem.status }}</td>
+            <td>
+                {% if ordem.arquivo %}
+                    <a href="{{ ordem.arquivo.url }}" target="_blank">Visualizar</a>
+                {% else %}
+                    Nenhum arquivo enviado
+                {% endif %}
+            </td>
+            {% if not eh_admin %}
+            <td>
+                {% if ordem.status != "Concluído" %}
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="ordem_id" value="{{ ordem.id }}">
+                        <input type="file" name="arquivo" required>
+                        <button type="submit">Enviar</button>
+                    </form>
+                {% else %}
+                    ✔ Concluído
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Você não tem nenhuma ordem de contrato.</p>
+{% endif %}
+
+{% endblock %}

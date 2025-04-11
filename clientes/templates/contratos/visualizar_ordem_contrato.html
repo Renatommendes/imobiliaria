@@ -1,0 +1,29 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Ordem de Contrato</h2>
+
+<p><strong>Nome do Usuário:</strong> {{ ordem.usuario.username }}</p>
+<p><strong>Nome da Ordem:</strong> {{ ordem.nome }}</p>  <!-- Adicionando o nome da ordem -->
+<p><strong>Tipo de Contrato:</strong> {{ ordem.tipo }}</p>
+<p><strong>Status:</strong> {{ ordem.status }}</p>
+<p><strong>Data de Criação:</strong> {{ ordem.data_criacao|date:"d/m/Y" }}</p>
+
+<!-- Exibir o arquivo enviado -->
+{% if ordem.arquivo %}
+    <p><strong>Arquivo enviado:</strong> <a href="{{ ordem.arquivo.url }}" target="_blank">Visualizar Contrato</a></p>
+{% else %}
+    <p><strong>Arquivo enviado:</strong> Nenhum arquivo enviado ainda.</p>
+{% endif %}
+
+<!-- Formulário para upload do contrato -->
+{% if user == ordem.usuario %}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Enviar / Atualizar Contrato</button>
+    </form>
+{% endif %}
+
+<a href="{% url 'listar_ordens_contrato' %}">Voltar</a>
+{% endblock %}

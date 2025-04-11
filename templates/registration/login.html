@@ -1,0 +1,30 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto; padding: 30px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+    <h2 style="text-align: center; margin-bottom: 20px;">🔐 Login</h2>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div style="display: flex; flex-direction: column;">
+                <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color: red; font-size: 0.9em;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" style="align-self: center; padding: 8px 50px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+            Entrar
+        </button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{% url 'password_reset' %}" style="color: #3498db;">Esqueceu sua senha?</a><br><br>
+        <p>Não tem uma conta? <a href="{% url 'signup' %}" style="color: #3498db;">Cadastre-se</a></p>
+    </div>
+</div>
+{% endblock %}

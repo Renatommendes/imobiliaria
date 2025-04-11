@@ -1,0 +1,12 @@
+{% extends "home.html" %}
+
+{% block content %}
+  <h2>Adicionar Item à Fase</h2>
+  <p><strong>Fase:</strong> {{ fase.nome }}</p>  <!-- Mostra só o nome da fase -->
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+  </form>
+{% endblock %}

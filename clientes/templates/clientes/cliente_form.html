@@ -1,0 +1,27 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 60px auto; padding: 30px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+    <h1 style="text-align: center; margin-bottom: 25px;">
+        {% if form.instance.pk %}
+            Editar Cliente
+        {% else %}
+            Novo Cliente
+        {% endif %}
+    </h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" style="padding: 10px 20px; font-size: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Salvar
+            </button>
+        </div>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{% url 'cliente_list' %}" style="color: #007BFF; text-decoration: none;">Voltar</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 60px auto; padding: 30px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+    <h1 style="text-align: center; margin-bottom: 25px;">Clientes</h1>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="{% url 'cliente_create' %}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px;">Novo Cliente</a>
+    </div>
+
+    <ul style="list-style-type: none; padding-left: 0;">
+        {% for cliente in clientes %}
+            <li style="margin-bottom: 15px; font-size: 16px;">
+                {{ cliente.nome }} - 
+                <a href="{% url 'cliente_edit' cliente.pk %}" style="color: #007BFF; text-decoration: none;">Editar</a> | 
+                <a href="{% url 'cliente_delete' cliente.pk %}" style="color: red; text-decoration: none;">Deletar</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

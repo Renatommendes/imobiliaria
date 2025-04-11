@@ -1,0 +1,169 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>{% if form.instance.pk %}Editar{% else %}Cadastrar{% endif %} Cliente</h1>
+
+    <!-- Menu de Navegação -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'cadastrar_cliente' %}">Cadastrar Cliente</a></li>
+            <li><a href="{% url 'listar_clientes' %}">Listar Clientes</a></li>
+        </ul>
+    </nav>
+
+    <!-- Formulário de Cadastro/Edição -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-salvar">Salvar</button>
+        </div>
+    </form>
+
+    <!-- Se for edição, exibir botão de exclusão -->
+    {% if form.instance.pk %}
+    <form method="post" action="{% url 'excluir_cliente' form.instance.pk %}" onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
+        {% csrf_token %}
+        <button type="submit" class="btn-excluir">Excluir Cliente</button>
+    </form>
+    {% endif %}
+
+    <!-- Lista de Clientes -->
+    <h2>Clientes</h2>
+    <ul>
+        {% for cliente in clientes %}
+            <li>
+                {{ cliente.nome }} - {{ cliente.email }}
+                {% if user.username == 'administrador' %}
+                    | <a href="{% url 'editar_cliente' cliente.pk %}">Editar</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin: 0;
+    }
+
+    h1, h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    nav {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    nav li {
+        display: inline;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: #007BFF;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+        text-decoration: underline;
+    }
+
+    form {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .form-group p {
+        flex: 1;
+        margin-bottom: 15px;
+    }
+
+    .form-actions {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .form-actions button {
+        padding: 12px 25px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .form-actions button:hover {
+        background-color: #45a049;
+    }
+
+    .btn-excluir {
+        padding: 12px 25px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    .btn-excluir:hover {
+        background-color: darkred;
+    }
+
+    ul {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    ul li {
+        background-color: #fff;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    ul li a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    ul li a:hover {
+        text-decoration: underline;
+    }
+</style>

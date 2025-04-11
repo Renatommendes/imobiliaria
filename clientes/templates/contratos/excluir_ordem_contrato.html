@@ -1,0 +1,19 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Excluir Ordem de Contrato</h2>
+
+<p>Tem certeza de que deseja excluir esta ordem de contrato?</p>
+
+<p><strong>Usuário:</strong> {{ ordem.usuario }}</p>
+<p><strong>Tipo:</strong> {{ ordem.tipo }}</p>
+<p><strong>Status:</strong> {{ ordem.status }}</p>
+<p><strong>Data de Criação:</strong> {{ ordem.data_criacao }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sim, excluir</button>
+    <a href="{% url 'listar_ordens_contratos' %}">Cancelar</a>
+</form>
+
+{% endblock %}

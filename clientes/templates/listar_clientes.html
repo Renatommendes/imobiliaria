@@ -1,0 +1,79 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>Clientes Cadastrados</h1>
+
+    <!-- Lista de Clientes -->
+    <div class="clientes-container">
+        <ul>
+            {% for cliente in clientes %}
+                <li class="cliente-item">
+                    <span class="cliente-nome">{{ cliente.nome }}</span> 
+                    <span class="cliente-email">{{ cliente.email }}</span> 
+                    <span class="cliente-telefone">{{ cliente.telefone }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
+
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .clientes-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .clientes-container ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .cliente-item {
+        background-color: #fff;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s;
+    }
+
+    .cliente-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    .cliente-nome {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .cliente-email, .cliente-telefone {
+        color: #555;
+    }
+
+    .cliente-item span {
+        margin-right: 20px;
+    }
+</style>

@@ -1,0 +1,106 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h2>Gerenciar Usuários</h2>
+    
+    <!-- Tabela de Usuários -->
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.username }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>
+                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn-edit">Editar</a>
+                    <a href="{% url 'excluir_usuario' usuario.id %}" class="btn-delete" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+<style>
+    /* Garantir que o estilo se aplica especificamente à página de Gerenciar Usuários */
+    table.user-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 20px !important;
+        background-color: #fff !important;
+    }
+
+    .user-table th, .user-table td {
+        border: 1px solid #ccc !important;
+        padding: 12px !important;
+        text-align: center !important;
+        font-size: 14px !important;
+    }
+
+    .user-table th {
+        background-color: #007bff !important;
+        color: white !important;
+    }
+
+    .user-table tr:nth-child(even) {
+        background-color: #f9f9f9 !important;
+    }
+
+    .user-table tr:hover {
+        background-color: #f1f1f1 !important;
+    }
+
+    /* Estilo das ações */
+    .btn-edit, .btn-delete {
+        padding: 8px 12px !important;
+        margin: 0 5px !important;
+        text-decoration: none !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+        text-align: center !important;
+    }
+
+    .btn-edit {
+        background-color: #28a745 !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .btn-edit:hover {
+        background-color: #218838 !important;
+    }
+
+    .btn-delete {
+        background-color: #dc3545 !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333 !important;
+    }
+
+    /* Estilos para o título e estrutura geral */
+    h2 {
+        text-align: center !important;
+        color: #333 !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Estilos do corpo */
+    body {
+        font-family: Arial, sans-serif !important;
+        background-color: #f4f7fc !important;
+        padding: 20px !important;
+        margin: 0 !important;
+    }
+</style>

@@ -1,0 +1,12 @@
+{% extends "home.html" %}
+{% block content %}
+<h2>Enviar Contrato: {{ ordem.nome }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar</button>
+</form>
+
+<a href="{% url 'listar_ordens_contrato' %}">Voltar</a>
+{% endblock %}

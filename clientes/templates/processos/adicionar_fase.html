@@ -1,0 +1,13 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Adicionar Nova Fase</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar Fase</button>
+</form>
+
+<a href="{% url 'pagina_processos' %}">← Voltar</a>
+{% endblock %}

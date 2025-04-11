@@ -1,0 +1,17 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>Editar Arquivo da Ordem de Contrato</h2>
+
+<p><strong>Ordem:</strong> {{ ordem.nome }}</p>
+<p><strong>Tipo:</strong> {{ ordem.tipo }}</p>
+<p><strong>Status:</strong> {{ ordem.status }}</p>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Atualizar Arquivo</button>
+</form>
+
+<a href="{% url 'listar_ordens_contrato' %}">Voltar</a>
+{% endblock %}

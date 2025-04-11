@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Boleto</title>
+</head>
+<body>
+    <h1>Editar Boleto</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label for="id_data_vencimento">Data de Vencimento:</label>
+            <input type="text" id="id_data_vencimento" name="data_vencimento" value="{{ form.data_vencimento.value }}" required>
+        </p>
+        {{ form.as_p }}
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <a href="{% url 'boletos' %}">Voltar</a>
+
+    <!-- Script para formatar a data -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataVencimentoInput = document.getElementById('id_data_vencimento');
+
+            // Formatar a data para dd/mm/yyyy ao carregar a página
+            if (dataVencimentoInput.value) {
+                const data = dataVencimentoInput.value.split('-');
+                if (data.length === 3) {
+                    dataVencimentoInput.value = data[2] + '/' + data[1] + '/' + data[0];
+                }
+            }
+
+            // Converter para yyyy-mm-dd ao enviar o formulário
+            document.querySelector('form').addEventListener('submit', function() {
+                const data = dataVencimentoInput.value.split('/');
+                if (data.length === 3) {
+                    dataVencimentoInput.value = data[2] + '-' + data[1] + '-' + data[0];
+                }
+            });
+        });
+    </script>
+</body>
+</html>
